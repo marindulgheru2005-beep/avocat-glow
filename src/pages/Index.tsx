@@ -11,6 +11,7 @@ import FAQ from '@/components/FAQ';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import FloatingCTA from '@/components/FloatingCTA';
+import ExitIntentModal from '@/components/ExitIntentModal';
 
 const Index = () => (
   <main>
@@ -27,6 +28,7 @@ const Index = () => (
     <Contact />
     <Footer />
     <FloatingCTA />
+    <ExitIntentModal />
   </main>
 );
 
