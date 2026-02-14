@@ -44,6 +44,7 @@ const GoldParticles = () => {
     });
 
     const animate = () => {
+      if (paused) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (particles.length < maxParticles && Math.random() < 0.1) {
@@ -74,11 +75,19 @@ const GoldParticles = () => {
       animationId = requestAnimationFrame(animate);
     };
 
+    let paused = false;
+    const handleVisibility = () => {
+      paused = document.hidden;
+      if (!paused) animationId = requestAnimationFrame(animate);
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     animate();
 
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 
