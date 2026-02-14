@@ -22,8 +22,9 @@ const GoldParticles = () => {
     if (!ctx) return;
 
     let animationId: number;
+    let paused = false;
     const particles: Particle[] = [];
-    const maxParticles = 40;
+    const maxParticles = 50;
 
     const resize = () => {
       canvas.width = canvas.offsetWidth;
@@ -32,21 +33,31 @@ const GoldParticles = () => {
     resize();
     window.addEventListener('resize', resize);
 
+    const handleVisibility = () => {
+      paused = document.hidden;
+      if (!paused) {
+        animationId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     const createParticle = (): Particle => ({
       x: Math.random() * canvas.width,
       y: canvas.height + 10,
-      size: Math.random() * 2.5 + 0.5,
-      speedY: -(Math.random() * 0.5 + 0.2),
-      speedX: (Math.random() - 0.5) * 0.3,
+      size: Math.random() * 2 + 0.5,
+      speedY: -(Math.random() * 0.4 + 0.15),
+      speedX: (Math.random() - 0.5) * 0.2,
       opacity: 0,
       life: 0,
-      maxLife: Math.random() * 400 + 200,
+      maxLife: Math.random() * 500 + 250,
     });
 
     const animate = () => {
+      if (paused) return;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (particles.length < maxParticles && Math.random() < 0.1) {
+      if (particles.length < maxParticles && Math.random() < 0.08) {
         particles.push(createParticle());
       }
 
@@ -57,13 +68,17 @@ const GoldParticles = () => {
         p.y += p.speedY;
 
         const lifeRatio = p.life / p.maxLife;
-        if (lifeRatio < 0.1) p.opacity = lifeRatio * 10;
-        else if (lifeRatio > 0.8) p.opacity = (1 - lifeRatio) * 5;
-        else p.opacity = 1;
+        if (lifeRatio < 0.1) {
+          p.opacity = lifeRatio * 10 * 0.3;
+        } else if (lifeRatio > 0.8) {
+          p.opacity = (1 - lifeRatio) * 5 * 0.3;
+        } else {
+          p.opacity = 0.1 + Math.random() * 0.2;
+        }
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(43, 52%, 54%, ${p.opacity * 0.6})`;
+        ctx.fillStyle = `rgba(201, 168, 76, ${p.opacity})`;
         ctx.fill();
 
         if (p.life >= p.maxLife || p.y < -10) {
@@ -79,6 +94,7 @@ const GoldParticles = () => {
     return () => {
       cancelAnimationFrame(animationId);
       window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 
@@ -87,6 +103,7 @@ const GoldParticles = () => {
       ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none"
       style={{ zIndex: 1 }}
+      aria-hidden="true"
     />
   );
 };
